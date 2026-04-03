@@ -12,6 +12,8 @@ OUTPUT_HTML = "docs/pricecatcher_chart.html"
 ITEM_MAP = {
     1:    "Standard Chicken (1kg)",
     1109: "Grade A Eggs (30pcs)",
+    1110: "Grade B Eggs (30pcs)",
+    1111: "Grade C Eggs (30pcs)",
     129:  "Large Onions (1kg)",
     114:  "Tomato (1kg)",
     94:   "Red Chili (1kg)"
