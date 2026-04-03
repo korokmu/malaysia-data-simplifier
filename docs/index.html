@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇲🇾 Malaysia Data Simplifier</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --accent: #3498db;
+            --border: #edf2f7;
+            --up: #e74c3c;
+            --down: #27ae60;
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        header { text-align: center; padding: 40px 0; }
+        h1 { margin: 0; font-size: 2rem; letter-spacing: -0.5px; }
+        .update-time { color: #7f8c8d; font-size: 0.9rem; margin-top: 5px; }
+
+        .section {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+        }
+
+        h2 { margin: 0 0 20px; font-size: 1.25rem; border-left: 4px solid var(--accent); padding-left: 12px; }
+
+        .note { font-size: 0.82rem; color: #64748b; background: #f8fafc; border-left: 3px solid #cbd5e1; border-radius: 4px; padding: 10px 14px; margin: -8px 0 20px; line-height: 1.6; }
+
+        .table-container { overflow-x: auto; margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 600px; }
+        th { text-align: left; background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.7rem; padding: 12px; border-bottom: 2px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
+        
+        .date-col { color: #64748b; font-weight: 500; white-space: nowrap; }
+        .price-val { font-family: monospace; font-weight: 600; color: #1a202c; font-size: 1.1rem; }
+        .chg-val { font-size: 0.8rem; font-weight: bold; }
+        .up { color: var(--up); }
+        .down { color: var(--down); }
+        .flat { color: #94a3b8; }
+
+        .grocery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 24px; }
+        .g-card { background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+        .g-name { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold; }
+        .g-price { font-size: 1.2rem; font-weight: 800; margin: 5px 0; }
+
+        .chart-frame { width: 100%; height: 600px; border-radius: 8px; overflow: hidden; background: #fafafa; }
+        .ex-chart-frame { height: 400px; }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .section { padding: 16px; }
+            h1 { font-size: 1.5rem; }
+            .chart-frame { height: 750px; }
+            .ex-chart-frame { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🇲🇾 Malaysia Data Simplifier</h1>
+            <div class="update-time">Last Updated: <span id="update-time">Loading...</span></div>
+        </header>
+
+        <!-- Grocery Section -->
+        <div class="section">
+            <h2>🛒 Essential Grocery Prices (National Avg)</h2>
+            <p class="note">📌 Prices shown are national averages collected from markets across Malaysia. Actual prices may vary by shop, location, and availability — especially for fresh produce which can change daily.</p>
+            <div class="grocery-grid" id="grocery-grid">
+                <!-- Data will go here -->
+            </div>
+        </div>
+
+        <!-- Fuel Section -->
+        <div class="section">
+            <h2>⛽ Weekly Fuel Prices & Changes</h2>
+            <p class="note">📌 Fuel prices are set weekly by the Malaysian government (Automatic Pricing Mechanism). RON95 is a market-priced fuel. <strong>BUDI RON95</strong> is the subsidised price (RM 1.88 off) for eligible Malaysians — you need to register your IC/MyKad with Setel or at a petrol station to get this rate.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>RON95</th>
+                            <th>BUDI RON95 🪪</th>
+                            <th>RON97</th>
+                            <th>Diesel (West)</th>
+                            <th>Diesel (East)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fuel-body"></tbody>
+                </table>
+            </div>
+            <h2>📈 Fuel Trend Analysis</h2>
+            <div class="chart-frame">
+                <iframe src="fuel_chart.html"></iframe>
+            </div>
+        </div>
+
+        <!-- Exchange Section -->
+        <div class="section">
+            <h2>💹 Exchange Rates (1 Unit = X MYR)</h2>
+            <p class="note">📌 Middle reference rates published daily by Bank Negara Malaysia (BNM) via data.gov.my. These are the official interbank reference rates — actual rates at banks and money changers will be slightly different (they apply their own buying/selling spread).</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>USD/MYR</th>
+                            <th>SGD/MYR</th>
+                            <th>EUR/MYR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ex-body"></tbody>
+                </table>
+            </div>
+            <h2>📈 Currency Trend Analysis</h2>
+            <div class="ex-chart-frame chart-frame">
+                <iframe src="exchange_chart.html"></iframe>
+            </div>
+        </div>
+
+        <footer style="text-align: center; color: #94a3b8; font-size: 0.85rem; padding: 40px 0;">
+            <p>Built with ❤️ on Arch Linux | Data from data.gov.my</p>
+        </footer>
+    </div>
+
+    <script>
+        function fmtChg(val) {
+            if (val > 0.0001) return `<span class="chg-val up">▲ +${val.toFixed(2)}</span>`;
+            if (val < -0.0001) return `<span class="chg-val down">▼ ${val.toFixed(2)}</span>`;
+            return `<span class="chg-val flat">━ 0.00</span>`;
+        }
+
+        fetch('latest_stats.json')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('update-time').textContent = data.update_time;
+                
+                // Grocery Grid
+                const gg = document.getElementById('grocery-grid');
+                data.grocery.forEach(g => {
+                    gg.innerHTML += `
+                        <div class="g-card">
+                            <div class="g-name">${g.name}</div>
+                            <div class="g-price">RM ${g.price.toFixed(2)}</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px;">${g.unit}</div>
+                            <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 5px;">As of ${g.date}</div>
+                        </div>
+                    `;
+                });
+
+                // Fuel Table
+                const fb = document.getElementById('fuel-body');
+                data.fuel.forEach(r => {
+                    fb.innerHTML += `
+                        <tr>
+                            <td class="date-col">${r.date}</td>
+                            <td><div class="price-val">RM ${r.ron95.toFixed(2)}</div>${fmtChg(r.ron95_chg)}</td>
+                            <td><div class="price-val">RM ${r.ron95_budi95.toFixed(2)}</div>${fmtChg(r.budi_chg)}</td>
+                            <td><div class="price-val">RM ${r.ron97.toFixed(2)}</div>${fmtChg(r.ron97_chg)}</td>
+                            <td><div class="price-val">RM ${r.diesel.toFixed(2)}</div>${fmtChg(r.diesel_chg)}</td>
+                            <td><div class="price-val">RM ${r.diesel_eastmsia.toFixed(2)}</div>${fmtChg(r.diesel_e_chg)}</td>
+                        </tr>
+                    `;
+                });
+
+                // Exchange Table
+                const eb = document.getElementById('ex-body');
+                data.exchange.forEach(r => {
+                    eb.innerHTML += `
+                        <tr>
+                            <td class="date-col">${r.date}</td>
+                            <td><div class="price-val">RM${r.usd.toFixed(2)}</div>${fmtChg(r.usd_chg)}</td>
+                            <td><div class="price-val">RM${r.sgd.toFixed(2)}</div>${fmtChg(r.sgd_chg)}</td>
+                            <td><div class="price-val">RM${r.eur.toFixed(2)}</div>${fmtChg(r.eur_chg)}</td>
+                        </tr>
+                    `;
+                });
+            });
+    </script>
+</body>
+</html>
