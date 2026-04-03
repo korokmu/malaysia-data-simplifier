@@ -92,6 +92,9 @@
         }
         .sticky-nav a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
+        /* offset section headings so sticky nav doesn't cover them on jump */
+        .section { scroll-margin-top: 60px; }
+
         /* ── Back to top ── */
         #back-to-top {
             position: fixed;
@@ -114,16 +117,13 @@
         #back-to-top.visible { display: flex; }
 
         @media (max-width: 600px) {
-            .sticky-nav { margin: 0 -10px 16px; gap: 6px; }
-            .sticky-nav a { font-size: 0.78rem; padding: 5px 10px; }
-        }
-
-        @media (max-width: 600px) {
             body { padding: 10px; }
             .section { padding: 16px; }
             h1 { font-size: 1.5rem; }
             .chart-frame { height: 750px; }
             .ex-chart-frame { height: 400px; }
+            .sticky-nav { margin: 0 -10px 16px; gap: 6px; }
+            .sticky-nav a { font-size: 0.78rem; padding: 5px 10px; }
         }
     </style>
 </head>
