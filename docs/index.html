@@ -43,8 +43,20 @@
 
         .note { font-size: 0.82rem; color: #64748b; background: #f8fafc; border-left: 3px solid #cbd5e1; border-radius: 4px; padding: 10px 14px; margin: -8px 0 20px; line-height: 1.6; }
 
-        .table-container { overflow-x: auto; margin-bottom: 24px; }
+        .table-container { overflow-x: auto; margin-bottom: 24px; position: relative; }
         table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 600px; }
+
+        /* fade-right hint — shows when table can scroll, hides when at end */
+        .table-container::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 48px; height: 100%;
+            background: linear-gradient(to right, transparent, white);
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .table-container.at-end::after { opacity: 0; }
         th { text-align: left; background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.7rem; padding: 12px; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); }
         
@@ -265,6 +277,18 @@
         const btn = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => {
             btn.classList.toggle('visible', window.scrollY > 300);
+        });
+
+        // Fade out right-edge gradient when table is fully scrolled
+        document.querySelectorAll('.table-container').forEach(tc => {
+            const check = () => {
+                const atEnd = tc.scrollLeft + tc.clientWidth >= tc.scrollWidth - 4;
+                tc.classList.toggle('at-end', atEnd);
+            };
+            tc.addEventListener('scroll', check);
+            // also check on data load (tables may not overflow on desktop)
+            window.addEventListener('load', check);
+            check();
         });
     </script>
 </body>
