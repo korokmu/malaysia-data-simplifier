@@ -12,13 +12,8 @@ FUEL_FILE = f"{DATA_FOLDER}/fuel_prices.parquet"
 FUEL_API_URL = "https://api.data.gov.my/data-catalogue?id=fuelprice"
 
 def check_vpn():
-    """
-    Check if a VPN is likely active by looking for common VPN network interfaces.
-    """
-    # This is a simple check. For ProtonVPN (Flatpak), we can also check for 'tun0'
-    # or use 'nmcli' if available. 
-    # For now, we'll just log a reminder as per your context.
-    print("💡 Reminder: Ensure ProtonVPN is active before scraping!")
+    """Remind operator to check network before scraping."""
+    print("💡 Reminder: Check your network connection before scraping!")
 
 def fetch_fuel_data():
     """
@@ -44,7 +39,7 @@ def fetch_fuel_data():
             "date", "ron95", "ron97", "diesel", "diesel_eastmsia", "ron95_budi95", "series_type"
         ])
         
-        # Save as Parquet (High-Efficiency format for your Arch Linux)
+        # Save as Parquet
         os.makedirs(DATA_FOLDER, exist_ok=True)
         df.write_parquet(FUEL_FILE)
         
