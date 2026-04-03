@@ -4,7 +4,7 @@
 
 set -e  # stop if any command fails
 
-PROJECT_DIR="/home/eri/workspace/malaysia-data-simplifier"
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_FILE="$PROJECT_DIR/update.log"
 PYTHON="$PROJECT_DIR/.venv/bin/python3"
 
