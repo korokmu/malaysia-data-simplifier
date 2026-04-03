@@ -64,6 +64,60 @@
         .ex-chart-frame { height: 400px; }
         iframe { width: 100%; height: 100%; border: none; }
 
+        /* ── Sticky Nav ── */
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            margin: 0 -20px 24px;
+        }
+        .sticky-nav a {
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s;
+        }
+        .sticky-nav a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        /* ── Back to top ── */
+        #back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(52,152,219,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        #back-to-top.visible { display: flex; }
+
+        @media (max-width: 600px) {
+            .sticky-nav { margin: 0 -10px 16px; gap: 6px; }
+            .sticky-nav a { font-size: 0.78rem; padding: 5px 10px; }
+        }
+
         @media (max-width: 600px) {
             body { padding: 10px; }
             .section { padding: 16px; }
@@ -81,8 +135,15 @@
             <div class="update-time">Last Updated: <span id="update-time">Loading...</span></div>
         </header>
 
+        <!-- Sticky Nav -->
+        <nav class="sticky-nav">
+            <a href="#grocery">🛒 Grocery</a>
+            <a href="#fuel">⛽ Fuel</a>
+            <a href="#exchange">💹 Exchange</a>
+        </nav>
+
         <!-- Grocery Section -->
-        <div class="section">
+        <div class="section" id="grocery">
             <h2>🛒 Essential Grocery Prices (National Avg)</h2>
             <p class="note">📌 Prices shown are national averages collected from markets across Malaysia. Actual prices may vary by shop, location, and availability — especially for fresh produce which can change daily.</p>
             <div class="grocery-grid" id="grocery-grid">
@@ -91,7 +152,7 @@
         </div>
 
         <!-- Fuel Section -->
-        <div class="section">
+        <div class="section" id="fuel">
             <h2>⛽ Weekly Fuel Prices & Changes</h2>
             <p class="note">📌 Fuel prices are set weekly by the Malaysian government (Automatic Pricing Mechanism). RON95 is a market-priced fuel. <strong>BUDI RON95</strong> is the subsidised price (RM 1.88 off) for eligible Malaysians — you need to register your IC/MyKad with Setel or at a petrol station to get this rate.</p>
             <div class="table-container">
@@ -116,7 +177,7 @@
         </div>
 
         <!-- Exchange Section -->
-        <div class="section">
+        <div class="section" id="exchange">
             <h2>💹 Exchange Rates (1 Unit = X MYR)</h2>
             <p class="note">📌 Middle reference rates published daily by Bank Negara Malaysia (BNM) via data.gov.my. These are the official interbank reference rates — actual rates at banks and money changers will be slightly different (they apply their own buying/selling spread).</p>
             <div class="table-container">
@@ -196,6 +257,15 @@
                     `;
                 });
             });
+    </script>
+
+    <!-- Back to top button -->
+    <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+    <script>
+        const btn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('visible', window.scrollY > 300);
+        });
     </script>
 </body>
 </html>
