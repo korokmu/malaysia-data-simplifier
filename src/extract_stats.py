@@ -36,17 +36,26 @@ def get_latest_stats():
         # We'll keep the value as is but label it 'JPY/100' in UI
         ex_list[i]['date'] = ex_list[i]['date'].strftime('%d %b %Y')
 
-    # 3. Grocery Stats (Price Catcher - Now State-Aware)
+    # 3. Grocery Stats (Price Catcher - Now State-Aware + Trend)
     df_grocery = pl.read_parquet("data/pricecatcher.parquet")
     
-    # Average per item per state on latest date
+    # Calculate 30-day averages per state/item
     latest_date = df_grocery.select(pl.col("date").max()).to_series()[0]
+    df_30d_avg = (
+        df_grocery.group_by(["state", "item_code"])
+        .agg(pl.col("price").mean().alias("avg_30d"))
+    )
+
+    # Latest prices
     df_state_prices = (
         df_grocery.filter(pl.col("date") == latest_date)
         .group_by(["state", "item_code"])
         .agg(pl.col("price").mean())
     )
     
+    # Join with 30d avg
+    df_trends = df_state_prices.join(df_30d_avg, on=["state", "item_code"])
+
     ITEM_MAP = {
         "1":    ("Chicken",      "per kg"),
         "1109": ("Eggs Grd A",   "per 30 pcs"),
@@ -58,15 +67,24 @@ def get_latest_stats():
     }
     
     grocery_data = []
-    for row in df_state_prices.to_dicts():
+    for row in df_trends.to_dicts():
         code_str = str(row["item_code"])
         if code_str in ITEM_MAP:
             name, unit = ITEM_MAP[code_str]
+            
+            # Logic for trend badge
+            trend = "flat"
+            if row["price"] < row["avg_30d"] * 0.98: # 2% cheaper than avg
+                trend = "good"
+            elif row["price"] > row["avg_30d"] * 1.02: # 2% more expensive
+                trend = "high"
+
             grocery_data.append({
                 "state": row["state"],
                 "name": name,
                 "unit": unit,
                 "price": row["price"],
+                "trend": trend,
                 "date": latest_date.strftime('%d %b')
             })
 

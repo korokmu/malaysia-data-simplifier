@@ -17,6 +17,7 @@ cd "$PROJECT_DIR"
 $PYTHON src/fetch_fuel.py         >> "$LOG_FILE" 2>&1
 $PYTHON src/fetch_exchange.py     >> "$LOG_FILE" 2>&1
 $PYTHON src/fetch_pricecatcher.py >> "$LOG_FILE" 2>&1
+$PYTHON src/fetch_weather.py      >> "$LOG_FILE" 2>&1
 
 # Regenerate charts and stats
 $PYTHON src/chart_fuel.py         >> "$LOG_FILE" 2>&1
@@ -33,5 +34,8 @@ git diff --cached --quiet && echo "$(date): No changes to commit" >> "$LOG_FILE"
 
 git commit -m "chore: daily data update $(date '+%Y-%m-%d')"
 git push
+
+# Send Discord notification (if configured)
+$PYTHON src/notify_discord.py >> "$LOG_FILE" 2>&1
 
 echo "$(date): Update complete ✅" >> "$LOG_FILE"
