@@ -103,9 +103,12 @@
             border: 1px solid var(--border);
             white-space: nowrap;
             transition: background 0.15s, color 0.15s;
+            -webkit-tap-highlight-color: transparent;
         }
-        .sticky-nav a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .sticky-nav a.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        @media (hover: hover) {
+            .sticky-nav a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        }
+        .sticky-nav a.active { background: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important; }
         .nav-label { font-size: 0.75rem; color: #94a3b8; font-weight: 600; align-self: center; white-space: nowrap; padding-right: 4px; }
 
         /* offset section headings so sticky nav doesn't cover them on jump */
@@ -292,15 +295,17 @@
         
         function updateNav() {
             let current = "";
-            const scrollPos = window.scrollY + 100; // Offset for sticky nav
-
-            if (window.scrollY < 50) {
+            
+            if (window.scrollY < 80) {
                 navLinks.forEach(a => a.classList.remove('active'));
                 return;
             }
 
             sections.forEach(s => {
-                if (s && scrollPos >= s.offsetTop) {
+                if (!s) return;
+                const rect = s.getBoundingClientRect();
+                // A section is current if its top has passed the sticky nav area
+                if (rect.top <= 150) {
                     current = s.getAttribute("id");
                 }
             });
@@ -313,8 +318,18 @@
             });
         }
 
-        window.addEventListener('scroll', updateNav);
+        window.addEventListener('scroll', updateNav, { passive: true });
         window.addEventListener('load', updateNav);
+
+        // Remove sticky state on mobile by blurring the link after click
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                setTimeout(() => {
+                    link.blur();
+                    updateNav();
+                }, 100);
+            });
+        });
     </script>
 </body>
 </html>
