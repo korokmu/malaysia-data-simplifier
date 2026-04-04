@@ -289,16 +289,42 @@
         // ── Active nav highlight on scroll ──
         const navLinks = document.querySelectorAll('.sticky-nav a');
         const sections = ['grocery', 'fuel', 'exchange'].map(id => document.getElementById(id));
+        
         const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    navLinks.forEach(a => a.classList.remove('active'));
-                    const link = document.querySelector(`.sticky-nav a[href="#${entry.target.id}"]`);
-                    if (link) link.classList.add('active');
-                }
-            });
-        }, { rootMargin: '-10% 0px -80% 0px' });
+            // Only update if we're not at the very top (let scroll listener handle top)
+            if (window.scrollY < 50) {
+                navLinks.forEach(a => a.classList.remove('active'));
+                return;
+            }
+
+            // Find all currently intersecting sections and pick the one with the highest ratio
+            const visibleSections = sections
+                .map(s => {
+                    const rect = s.getBoundingClientRect();
+                    const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+                    return { id: s.id, ratio: visibleHeight / window.innerHeight };
+                })
+                .filter(s => s.ratio > 0.1)
+                .sort((a, b) => b.ratio - a.ratio);
+
+            if (visibleSections.length > 0) {
+                navLinks.forEach(a => a.classList.remove('active'));
+                const link = document.querySelector(`.sticky-nav a[href="#${visibleSections[0].id}"]`);
+                if (link) link.classList.add('active');
+            }
+        }, { 
+            threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+            rootMargin: '-10% 0px -10% 0px' 
+        });
+
         sections.forEach(s => s && observer.observe(s));
+
+        // Fallback for the very top of the page
+        window.addEventListener('scroll', () => {
+            if (window.scrollY < 50) {
+                navLinks.forEach(a => a.classList.remove('active'));
+            }
+        });
     </script>
 </body>
 </html>
