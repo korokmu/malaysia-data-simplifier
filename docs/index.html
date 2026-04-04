@@ -201,6 +201,10 @@
                 <button class="p-btn" id="btn-visitor" onclick="setPersona('visitor')">🌏 Visitor</button>
                 <button class="p-btn" id="btn-all" onclick="setPersona('all')">📄 Show All</button>
             </div>
+
+            <p class="note" style="max-width: 600px; margin: 24px auto 0; text-align: center; border: none; background: #ebf4ff; color: #2b6cb0;">
+                👋 <b>Welcome!</b> Choose your view above to prioritize the most relevant data for your needs.
+            </p>
         </header>
 
         <!-- Sticky Nav -->
@@ -402,10 +406,8 @@
                     <a href="#weather">🌦️ Weather</a>
                 `;
             }
-            // Re-bind click listeners to new nav links
-            document.querySelectorAll('.sticky-nav a').forEach(link => {
-                link.addEventListener('click', () => setTimeout(updateNav, 10));
-            });
+            // Re-sync global navLinks reference
+            navLinks = document.querySelectorAll('.sticky-nav a');
             updateNav();
         }
     </script>
@@ -419,25 +421,26 @@
         });
 
         // ── Active nav highlight on scroll ──
-        const navLinks = document.querySelectorAll('.sticky-nav a');
+        let navLinks = document.querySelectorAll('.sticky-nav a');
         const sections = ['weather', 'grocery', 'fuel', 'exchange'].map(id => document.getElementById(id));
         
         function updateNav() {
             let current = "";
             
-            if (window.scrollY < 80) {
+            if (window.scrollY < 120) {
                 navLinks.forEach(a => a.classList.remove('active'));
                 return;
             }
 
-            sections.forEach(s => {
-                if (!s) return;
-                const rect = s.getBoundingClientRect();
-                // A section is current if its top has passed the sticky nav area
-                if (rect.top <= 150) {
-                    current = s.getAttribute("id");
-                }
-            });
+            // Get all sections, filter those above viewport middle, pick the last one
+            const activeSection = sections
+                .map(s => ({ id: s.id, top: s.getBoundingClientRect().top }))
+                .filter(s => s.top <= 200)
+                .sort((a, b) => b.top - a.top)[0];
+
+            if (activeSection) {
+                current = activeSection.id;
+            }
 
             navLinks.forEach(a => {
                 a.classList.remove("active");
@@ -449,16 +452,6 @@
 
         window.addEventListener('scroll', updateNav, { passive: true });
         window.addEventListener('load', updateNav);
-
-        // Remove sticky state on mobile by blurring the link after click
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                setTimeout(() => {
-                    link.blur();
-                    updateNav();
-                }, 100);
-            });
-        });
     </script>
 </body>
 </html>
