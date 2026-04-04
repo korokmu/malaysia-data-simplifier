@@ -3,5 +3,10 @@ data/
 __pycache__/
 *.pyc
 
+# Personal/internal docs — stay local only
+OWNER_GUIDE.md
+SESSION_HANDOFF.md
+continue gemini session.txt
+
 # Override global gitignore — docs/latest_stats.json must be committed (it's the dashboard data)
 !docs/*.json
