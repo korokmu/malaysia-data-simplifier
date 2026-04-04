@@ -32,7 +32,7 @@ def fetch_exchange_data():
         df = df.filter(pl.col("rate_type") == "middle").with_columns(
             pl.col("date").str.to_date()
         ).select([
-            "date", "usd", "sgd", "eur", "gbp", "jpy", "aud", "cny"
+            "date", "usd", "sgd", "eur", "gbp", "jpy", "aud", "cny", "idr"
         ])
 
         

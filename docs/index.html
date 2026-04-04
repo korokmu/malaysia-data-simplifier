@@ -266,8 +266,8 @@
                             <th>RON95</th>
                             <th class="visitor-hide">BUDI RON95 🪪</th>
                             <th>RON97</th>
-                            <th>Diesel (West)</th>
-                            <th>Diesel (East)</th>
+                            <th>Diesel (Peninsular)</th>
+                            <th>Diesel (Sabah & Sarawak)</th>
                         </tr>
                     </thead>
                     <tbody id="fuel-body"></tbody>
@@ -289,12 +289,13 @@
                         <tr>
                             <th>Date</th>
                             <th>USD</th>
-                            <th>SGD</th>
-                            <th>EUR</th>
-                            <th>GBP</th>
-                            <th>JPY/100</th>
-                            <th>AUD</th>
-                            <th>CNY</th>
+                             <th>SGD</th>
+                             <th>EUR</th>
+                             <th>GBP</th>
+                             <th>JPY/100</th>
+                             <th>AUD</th>
+                             <th>CNY</th>
+                             <th>IDR/10k</th>
                         </tr>
                     </thead>
                     <tbody id="ex-body"></tbody>
@@ -313,13 +314,10 @@
                         <option value="jpy">JPY 🇯🇵</option>
                         <option value="aud">AUD 🇦🇺</option>
                         <option value="cny">CNY 🇨🇳</option>
+                        <option value="idr">IDR 🇮🇩</option>
                     </select>
                 </div>
                 <div class="calc-result" id="calc-result">Enter an amount above to see the result.</div>
-            </div>
-            <h2>📈 Currency Trend Analysis</h2>
-            <div class="ex-chart-frame chart-frame">
-                <iframe src="exchange_chart.html"></iframe>
             </div>
         </div>
 
@@ -393,6 +391,7 @@
                             <td><div class="price-val">RM${r.jpy.toFixed(2)}</div>${fmtChg(r.jpy_chg)}</td>
                             <td><div class="price-val">RM${r.aud.toFixed(2)}</div>${fmtChg(r.aud_chg)}</td>
                             <td><div class="price-val">RM${r.cny.toFixed(2)}</div>${fmtChg(r.cny_chg)}</td>
+                            <td><div class="price-val">RM${(r.idr * 10000).toFixed(2)}</div>${fmtChg(r.idr_chg)}</td>
                         </tr>
                     `;
                 });
@@ -514,7 +513,7 @@
                 return;
             }
 
-            // JPY rate from BNM is per 100 units
+            // JPY rate from BNM is per 100 units; IDR is per 1 unit (very small, no scaling needed)
             const rm = currency === 'jpy' ? (amount / 100) * rate : amount * rate;
             const label = document.getElementById('calc-currency').options[document.getElementById('calc-currency').selectedIndex].text;
             resultEl.textContent = `${amount.toLocaleString()} ${label} = RM ${rm.toFixed(2)}`;

@@ -31,6 +31,7 @@ def get_latest_stats():
         ex_list[i]['jpy_chg'] = ex_list[i]['jpy'] - ex_list[i+1]['jpy']
         ex_list[i]['aud_chg'] = ex_list[i]['aud'] - ex_list[i+1]['aud']
         ex_list[i]['cny_chg'] = ex_list[i]['cny'] - ex_list[i+1]['cny']
+        ex_list[i]['idr_chg'] = ex_list[i]['idr'] - ex_list[i+1]['idr']
         
         # Convert JPY to 1-unit price for the dashboard display consistency (if BNM gives per 100)
         # We'll keep the value as is but label it 'JPY/100' in UI
@@ -40,21 +41,20 @@ def get_latest_stats():
     df_grocery = pl.read_parquet("data/pricecatcher.parquet")
     
     # Calculate 30-day averages per state/item
-    latest_date = df_grocery.select(pl.col("date").max()).to_series()[0]
     df_30d_avg = (
         df_grocery.group_by(["state", "item_code"])
         .agg(pl.col("price").mean().alias("avg_30d"))
     )
 
-    # Latest prices
-    df_state_prices = (
-        df_grocery.filter(pl.col("date") == latest_date)
+    # Get latest price per state/item (most robust)
+    df_latest_state_prices = (
+        df_grocery.sort("date", descending=True)
         .group_by(["state", "item_code"])
-        .agg(pl.col("price").mean())
+        .first() # Takes the newest row for every combo
     )
     
     # Join with 30d avg
-    df_trends = df_state_prices.join(df_30d_avg, on=["state", "item_code"])
+    df_trends = df_latest_state_prices.join(df_30d_avg, on=["state", "item_code"])
 
     ITEM_MAP = {
         "1":    ("Chicken",      "per kg"),
@@ -85,7 +85,7 @@ def get_latest_stats():
                 "unit": unit,
                 "price": row["price"],
                 "trend": trend,
-                "date": latest_date.strftime('%d %b')
+                "date": row["date"].strftime('%d %b') # Individual date per item/state
             })
 
     # List of all states for the dropdown
