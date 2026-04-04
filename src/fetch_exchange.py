@@ -28,11 +28,11 @@ def fetch_exchange_data():
 
         # Clean the data:
         # 1. Convert 'date' string to actual Date type
-        # 2. Keep only important columns (USD, SGD, EUR, GBP)
+        # 2. Keep only important columns
         df = df.filter(pl.col("rate_type") == "middle").with_columns(
             pl.col("date").str.to_date()
         ).select([
-            "date", "usd", "sgd", "eur", "gbp"
+            "date", "usd", "sgd", "eur", "gbp", "jpy", "aud", "cny"
         ])
 
         

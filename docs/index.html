@@ -268,9 +268,13 @@
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>USD/MYR</th>
-                            <th>SGD/MYR</th>
-                            <th>EUR/MYR</th>
+                            <th>USD</th>
+                            <th>SGD</th>
+                            <th>EUR</th>
+                            <th>GBP</th>
+                            <th>JPY/100</th>
+                            <th>AUD</th>
+                            <th>CNY</th>
                         </tr>
                     </thead>
                     <tbody id="ex-body"></tbody>
@@ -336,6 +340,10 @@
                             <td><div class="price-val">RM${r.usd.toFixed(2)}</div>${fmtChg(r.usd_chg)}</td>
                             <td><div class="price-val">RM${r.sgd.toFixed(2)}</div>${fmtChg(r.sgd_chg)}</td>
                             <td><div class="price-val">RM${r.eur.toFixed(2)}</div>${fmtChg(r.eur_chg)}</td>
+                            <td><div class="price-val">RM${r.gbp.toFixed(2)}</div>${fmtChg(r.gbp_chg)}</td>
+                            <td><div class="price-val">RM${r.jpy.toFixed(2)}</div>${fmtChg(r.jpy_chg)}</td>
+                            <td><div class="price-val">RM${r.aud.toFixed(2)}</div>${fmtChg(r.aud_chg)}</td>
+                            <td><div class="price-val">RM${r.cny.toFixed(2)}</div>${fmtChg(r.cny_chg)}</td>
                         </tr>
                     `;
                 });

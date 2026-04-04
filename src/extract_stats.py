@@ -28,6 +28,12 @@ def get_latest_stats():
         ex_list[i]['sgd_chg'] = ex_list[i]['sgd'] - ex_list[i+1]['sgd']
         ex_list[i]['eur_chg'] = ex_list[i]['eur'] - ex_list[i+1]['eur']
         ex_list[i]['gbp_chg'] = ex_list[i]['gbp'] - ex_list[i+1]['gbp']
+        ex_list[i]['jpy_chg'] = ex_list[i]['jpy'] - ex_list[i+1]['jpy']
+        ex_list[i]['aud_chg'] = ex_list[i]['aud'] - ex_list[i+1]['aud']
+        ex_list[i]['cny_chg'] = ex_list[i]['cny'] - ex_list[i+1]['cny']
+        
+        # Convert JPY to 1-unit price for the dashboard display consistency (if BNM gives per 100)
+        # We'll keep the value as is but label it 'JPY/100' in UI
         ex_list[i]['date'] = ex_list[i]['date'].strftime('%d %b %Y')
 
     # 3. Grocery Stats (Price Catcher)
@@ -39,7 +45,6 @@ def get_latest_stats():
         .sort("date", descending=True)
     )
     
-    # Map item codes to names and units for the dashboard (codes verified against live data)
     ITEM_MAP = {
         "1":    ("Chicken",      "per kg"),
         "1109": ("Eggs Grd A",   "per 30 pcs"),
@@ -50,32 +55,86 @@ def get_latest_stats():
         "94":   ("Red Chili",    "per kg"),
     }
     
-    # We want the latest prices for each item
     latest_groceries = []
     for code, (name, unit) in ITEM_MAP.items():
-        item_data = df_grocery.filter(pl.col("item_code") == int(code)).head(2).to_dicts()
-        if len(item_data) >= 1:
-            curr = item_data[0]
-            prev = item_data[1] if len(item_data) > 1 else curr
-            latest_groceries.append({
-                "name": name,
-                "unit": unit,
-                "price": curr["price"],
-                "chg": curr["price"] - prev["price"],
-                "date": curr["date"].strftime('%d %b')
+        try:
+            item_data = df_grocery.filter(pl.col("item_code") == int(code)).head(2).to_dicts()
+            if len(item_data) >= 1:
+                curr = item_data[0]
+                prev = item_data[1] if len(item_data) > 1 else curr
+                latest_groceries.append({
+                    "name": name,
+                    "unit": unit,
+                    "price": curr["price"],
+                    "chg": curr["price"] - prev["price"],
+                    "date": curr["date"].strftime('%d %b')
+                })
+        except:
+            continue
+
+    # 4. Weather Stats
+    weather_list = []
+    if pl.read_parquet("data/weather.parquet").height > 0:
+        df_weather = pl.read_parquet("data/weather.parquet")
+        
+        # WMO Weather code mapping
+        WMO_MAP = {
+            0: ("Clear sky", "☀️"),
+            1: ("Mainly clear", "🌤️"),
+            2: ("Partly cloudy", "⛅"),
+            3: ("Overcast", "☁️"),
+            45: ("Fog", "🌫️"),
+            48: ("Depositing rime fog", "🌫️"),
+            51: ("Light drizzle", "🌦️"),
+            53: ("Moderate drizzle", "🌦️"),
+            55: ("Dense drizzle", "🌦️"),
+            61: ("Slight rain", "🌧️"),
+            63: ("Moderate rain", "🌧️"),
+            65: ("Heavy rain", "🌧️"),
+            71: ("Slight snow fall", "❄️"),
+            73: ("Moderate snow fall", "❄️"),
+            75: ("Heavy snow fall", "❄️"),
+            77: ("Snow grains", "❄️"),
+            80: ("Slight rain showers", "🌦️"),
+            81: ("Moderate rain showers", "🌦️"),
+            82: ("Violent rain showers", "🌧️"),
+            95: ("Thunderstorm", "⛈️"),
+            96: ("Thunderstorm with slight hail", "⛈️"),
+            99: ("Thunderstorm with heavy hail", "⛈️"),
+        }
+
+        cities = df_weather.select("city").unique().to_series().to_list()
+        for city in cities:
+            city_data = df_weather.filter(pl.col("city") == city).sort("date").head(3).to_dicts()
+            forecasts = []
+            for f in city_data:
+                desc, emoji = WMO_MAP.get(f["weather_code"], ("Unknown", "❓"))
+                # Convert 'YYYY-MM-DD' to 'DD MMM'
+                dt = datetime.strptime(f["date"], "%Y-%m-%d")
+                forecasts.append({
+                    "day": dt.strftime("%a"), # e.g. Mon, Tue
+                    "date": dt.strftime("%d %b"),
+                    "emoji": emoji,
+                    "desc": desc,
+                    "max": f["temp_max"],
+                    "min": f["temp_min"]
+                })
+            weather_list.append({
+                "city": city,
+                "forecasts": forecasts
             })
 
     stats = {
         "update_time": datetime.now().strftime("%d %b %Y, %I:%M %p"),
         "fuel": fuel_list[:7],
         "exchange": ex_list[:7],
-        "grocery": latest_groceries
+        "grocery": latest_groceries,
+        "weather": weather_list
     }
     return stats
 
 if __name__ == "__main__":
     stats = get_latest_stats()
-    # Save to 'docs' folder so the web server can see it
     with open("docs/latest_stats.json", "w") as f:
         json.dump(stats, f)
     print("✅ Precision stats saved to docs/latest_stats.json")
