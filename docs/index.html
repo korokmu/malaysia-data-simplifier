@@ -418,21 +418,27 @@
             // Update Grocery
             const gg = document.getElementById('grocery-grid');
             gg.innerHTML = '';
-            rawData.grocery.filter(g => g.state === state).forEach(g => {
-                let badgeHtml = '';
-                if (g.trend === 'good') badgeHtml = '<div class="badge badge-good">✅ Good Deal</div>';
-                if (g.trend === 'high') badgeHtml = '<div class="badge badge-high">🔥 Price Hike</div>';
+            const filteredGroceries = rawData.grocery.filter(g => g.state === state);
+            
+            if (filteredGroceries.length === 0) {
+                gg.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #94a3b8;">⚠️ Grocery data for this state is temporarily unavailable.</div>';
+            } else {
+                filteredGroceries.forEach(g => {
+                    let badgeHtml = '';
+                    if (g.trend === 'good') badgeHtml = '<div class="badge badge-good">✅ Good Deal</div>';
+                    if (g.trend === 'high') badgeHtml = '<div class="badge badge-high">🔥 Price Hike</div>';
 
-                gg.innerHTML += `
-                    <div class="g-card">
-                        ${badgeHtml}
-                        <div class="g-name">${g.name}</div>
-                        <div class="g-price">RM ${g.price.toFixed(2)}</div>
-                        <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px;">${g.unit}</div>
-                        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 5px;">As of ${g.date}</div>
-                    </div>
-                `;
-            });
+                    gg.innerHTML += `
+                        <div class="g-card">
+                            ${badgeHtml}
+                            <div class="g-name">${g.name}</div>
+                            <div class="g-price">RM ${g.price.toFixed(2)}</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px;">${g.unit}</div>
+                            <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 5px;">As of ${g.date}</div>
+                        </div>
+                    `;
+                });
+            }
 
             // Update Weather
             const wg = document.getElementById('weather-grid');
@@ -452,6 +458,8 @@
                         ${forecastHtml}
                     </div>
                 `;
+            } else {
+                wg.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: #94a3b8;">🌦️ Weather data for this city is temporarily unavailable.</div>';
             }
         }
     </script>
