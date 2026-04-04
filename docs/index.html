@@ -69,6 +69,12 @@
         .down { color: var(--down); }
         .flat { color: #94a3b8; }
 
+        /* Persona visibility */
+        .visitor-hide { display: none; }
+        .persona-local .visitor-hide { display: table-cell; }
+        .persona-all .visitor-hide { display: table-cell; }
+        .persona-visitor .visitor-hide { display: none; }
+
         .grocery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 24px; }
         .g-card { background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
         .g-name { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold; }
@@ -123,6 +129,31 @@
         .sticky-nav a.active { background: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important; }
         .nav-label { font-size: 0.75rem; color: #94a3b8; font-weight: 600; align-self: center; white-space: nowrap; padding-right: 4px; }
 
+        /* ── Persona Selector ── */
+        .persona-selector {
+            display: inline-flex;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        .p-btn {
+            border: none;
+            background: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+        .p-btn.active {
+            background: white !important;
+            color: var(--primary) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
         /* offset section headings so sticky nav doesn't cover them on jump */
         .section { scroll-margin-top: 60px; }
 
@@ -164,10 +195,16 @@
         <header>
             <h1>🇲🇾 Malaysia Data Simplifier</h1>
             <div class="update-time">Last Updated: <span id="update-time">Loading...</span></div>
+            
+            <div class="persona-selector">
+                <button class="p-btn active" id="btn-local" onclick="setPersona('local')">🇲🇾 Local</button>
+                <button class="p-btn" id="btn-visitor" onclick="setPersona('visitor')">🌏 Visitor</button>
+                <button class="p-btn" id="btn-all" onclick="setPersona('all')">📄 Show All</button>
+            </div>
         </header>
 
         <!-- Sticky Nav -->
-        <nav class="sticky-nav">
+        <nav class="sticky-nav" id="main-nav">
             <span class="nav-label">Jump to:</span>
             <a href="#grocery">🛒 Grocery</a>
             <a href="#fuel">⛽ Fuel</a>
@@ -203,7 +240,7 @@
                         <tr>
                             <th>Date</th>
                             <th>RON95</th>
-                            <th>BUDI RON95 🪪</th>
+                            <th class="visitor-hide">BUDI RON95 🪪</th>
                             <th>RON97</th>
                             <th>Diesel (West)</th>
                             <th>Diesel (East)</th>
@@ -278,7 +315,7 @@
                         <tr>
                             <td class="date-col">${r.date}</td>
                             <td><div class="price-val">RM ${r.ron95.toFixed(2)}</div>${fmtChg(r.ron95_chg)}</td>
-                            <td><div class="price-val">RM ${r.ron95_budi95.toFixed(2)}</div>${fmtChg(r.budi_chg)}</td>
+                            <td class="visitor-hide"><div class="price-val">RM ${r.ron95_budi95.toFixed(2)}</div>${fmtChg(r.budi_chg)}</td>
                             <td><div class="price-val">RM ${r.ron97.toFixed(2)}</div>${fmtChg(r.ron97_chg)}</td>
                             <td><div class="price-val">RM ${r.diesel.toFixed(2)}</div>${fmtChg(r.diesel_chg)}</td>
                             <td><div class="price-val">RM ${r.diesel_eastmsia.toFixed(2)}</div>${fmtChg(r.diesel_e_chg)}</td>
@@ -319,8 +356,58 @@
                     });
                 }
 
-                // Data will be visible instantly; table-container CSS handles scroll hints
+                // Set default persona
+                setPersona('local');
             });
+
+        function setPersona(role) {
+            document.body.classList.remove('persona-local', 'persona-visitor', 'persona-all');
+            document.body.classList.add(`persona-${role}`);
+            
+            document.querySelectorAll('.p-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${role}`).classList.add('active');
+
+            const container = document.querySelector('.container');
+            const nav = document.getElementById('main-nav');
+            const weather = document.getElementById('weather');
+            const grocery = document.getElementById('grocery');
+            const fuel = document.getElementById('fuel');
+            const exchange = document.getElementById('exchange');
+
+            if (role === 'visitor') {
+                container.insertBefore(weather, nav.nextSibling);
+                container.insertBefore(exchange, weather.nextSibling);
+                container.insertBefore(grocery, exchange.nextSibling);
+                container.insertBefore(fuel, grocery.nextSibling);
+                
+                nav.innerHTML = `
+                    <span class="nav-label">Jump to:</span>
+                    <a href="#weather">🌦️ Weather</a>
+                    <a href="#exchange">💹 Exchange</a>
+                    <a href="#grocery">🛒 Grocery</a>
+                    <a href="#fuel">⛽ Fuel</a>
+                `;
+            } else {
+                // Local or All: Grocery -> Fuel -> Exchange -> Weather
+                container.insertBefore(grocery, nav.nextSibling);
+                container.insertBefore(fuel, grocery.nextSibling);
+                container.insertBefore(exchange, fuel.nextSibling);
+                container.insertBefore(weather, exchange.nextSibling);
+
+                nav.innerHTML = `
+                    <span class="nav-label">Jump to:</span>
+                    <a href="#grocery">🛒 Grocery</a>
+                    <a href="#fuel">⛽ Fuel</a>
+                    <a href="#exchange">💹 Exchange</a>
+                    <a href="#weather">🌦️ Weather</a>
+                `;
+            }
+            // Re-bind click listeners to new nav links
+            document.querySelectorAll('.sticky-nav a').forEach(link => {
+                link.addEventListener('click', () => setTimeout(updateNav, 10));
+            });
+            updateNav();
+        }
     </script>
 
     <!-- Back to top button -->
