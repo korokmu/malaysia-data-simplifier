@@ -97,7 +97,13 @@
             gap: 8px;
             padding: 10px 16px;
             margin: 0 -20px 24px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
+        /* Hide scrollbar for nav but keep functionality */
+        .sticky-nav::-webkit-scrollbar { display: none; }
+        .sticky-nav { -ms-overflow-style: none; scrollbar-width: none; }
+
         .sticky-nav a {
             text-decoration: none;
             color: var(--primary);
