@@ -76,9 +76,12 @@
         .persona-visitor .visitor-hide { display: none; }
 
         .grocery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 24px; }
-        .g-card { background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+        .g-card { background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); position: relative; }
         .g-name { font-size: 0.8rem; color: #64748b; text-transform: uppercase; font-weight: bold; }
         .g-price { font-size: 1.2rem; font-weight: 800; margin: 5px 0; }
+        .badge { position: absolute; top: -8px; right: -8px; padding: 4px 8px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; color: white; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .badge-good { background: var(--down); }
+        .badge-high { background: var(--up); }
 
         .weather-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 24px; }
         .w-card { background: #f8fafc; padding: 18px; border-radius: 12px; border: 1px solid var(--border); }
@@ -416,8 +419,13 @@
             const gg = document.getElementById('grocery-grid');
             gg.innerHTML = '';
             rawData.grocery.filter(g => g.state === state).forEach(g => {
+                let badgeHtml = '';
+                if (g.trend === 'good') badgeHtml = '<div class="badge badge-good">✅ Good Deal</div>';
+                if (g.trend === 'high') badgeHtml = '<div class="badge badge-high">🔥 Price Hike</div>';
+
                 gg.innerHTML += `
                     <div class="g-card">
+                        ${badgeHtml}
                         <div class="g-name">${g.name}</div>
                         <div class="g-price">RM ${g.price.toFixed(2)}</div>
                         <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px;">${g.unit}</div>
