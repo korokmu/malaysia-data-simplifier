@@ -35,7 +35,7 @@ def fetch_pricecatcher_data():
         q = (
             pl.scan_parquet(current_month_url)
             .filter(pl.col("item_code").is_in(ESSENTIAL_ITEMS))
-            .select(["date", "item_code", "price"])
+            .select(["date", "item_code", "price", "state"])
         )
         
         # Collect (streaming deprecated in 1.25.0, using engine="threading" or default)

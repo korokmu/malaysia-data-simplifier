@@ -202,6 +202,14 @@
                 <button class="p-btn" id="btn-all" onclick="setPersona('all')">📄 Show All</button>
             </div>
 
+            <!-- State Selector -->
+            <div style="margin-top: 15px;">
+                <label for="state-select" style="font-size: 0.8rem; font-weight: 700; color: #64748b; margin-right: 8px;">My State:</label>
+                <select id="state-select" onchange="updateStateView()" style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: white; font-weight: 600; color: var(--primary);">
+                    <!-- States will be populated by JS -->
+                </select>
+            </div>
+
             <p class="note" style="max-width: 600px; margin: 24px auto 0; text-align: center; border: none; background: #ebf4ff; color: #2b6cb0;">
                 👋 <b>Welcome!</b> Choose your view above to prioritize the most relevant data for your needs.
             </p>
@@ -292,6 +300,8 @@
     </div>
 
     <script>
+        let rawData = null;
+
         function fmtChg(val) {
             if (val > 0.0001) return `<span class="chg-val up">▲ +${val.toFixed(2)}</span>`;
             if (val < -0.0001) return `<span class="chg-val down">▼ ${val.toFixed(2)}</span>`;
@@ -301,19 +311,17 @@
         fetch('latest_stats.json')
             .then(res => res.json())
             .then(data => {
+                rawData = data;
                 document.getElementById('update-time').textContent = data.update_time;
-                
-                // Grocery Grid
-                const gg = document.getElementById('grocery-grid');
-                data.grocery.forEach(g => {
-                    gg.innerHTML += `
-                        <div class="g-card">
-                            <div class="g-name">${g.name}</div>
-                            <div class="g-price">RM ${g.price.toFixed(2)}</div>
-                            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px;">${g.unit}</div>
-                            <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 5px;">As of ${g.date}</div>
-                        </div>
-                    `;
+
+                // Populate States Dropdown
+                const ss = document.getElementById('state-select');
+                data.states.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = s;
+                    if (s === "W.P. Kuala Lumpur") opt.selected = true;
+                    ss.appendChild(opt);
                 });
 
                 // Fuel Table
@@ -348,30 +356,11 @@
                     `;
                 });
 
-                // Weather Grid
-                const wg = document.getElementById('weather-grid');
-                if (data.weather) {
-                    data.weather.forEach(w => {
-                        let forecastHtml = w.forecasts.map(f => `
-                            <div class="w-day">
-                                <span>${f.day} ${f.emoji}</span>
-                                <span class="w-temp">${f.max}° / ${f.min}°</span>
-                            </div>
-                        `).join('');
-                        
-                        wg.innerHTML += `
-                            <div class="w-card">
-                                <div class="w-city">${w.city}</div>
-                                ${forecastHtml}
-                            </div>
-                        `;
-                    });
-                }
+                updateStateView();
 
                 // Set default persona
                 setPersona('local');
             });
-
         function setPersona(role) {
             document.body.classList.remove('persona-local', 'persona-visitor', 'persona-all');
             document.body.classList.add(`persona-${role}`);
@@ -417,6 +406,45 @@
             // Re-sync global navLinks reference
             navLinks = document.querySelectorAll('.sticky-nav a');
             updateNav();
+        }
+
+        function updateStateView() {
+            const state = document.getElementById('state-select').value;
+            const city = rawData.state_capital_map[state];
+
+            // Update Grocery
+            const gg = document.getElementById('grocery-grid');
+            gg.innerHTML = '';
+            rawData.grocery.filter(g => g.state === state).forEach(g => {
+                gg.innerHTML += `
+                    <div class="g-card">
+                        <div class="g-name">${g.name}</div>
+                        <div class="g-price">RM ${g.price.toFixed(2)}</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px;">${g.unit}</div>
+                        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 5px;">As of ${g.date}</div>
+                    </div>
+                `;
+            });
+
+            // Update Weather
+            const wg = document.getElementById('weather-grid');
+            wg.innerHTML = '';
+            const w = rawData.weather.find(wc => wc.city === city);
+            if (w) {
+                let forecastHtml = w.forecasts.map(f => `
+                    <div class="w-day">
+                        <span>${f.day} ${f.emoji}</span>
+                        <span class="w-temp">${f.max}° / ${f.min}°</span>
+                    </div>
+                `).join('');
+                
+                wg.innerHTML += `
+                    <div class="w-card" style="max-width: 300px; margin: 0 auto;">
+                        <div class="w-city">${w.city} (${state})</div>
+                        ${forecastHtml}
+                    </div>
+                `;
+            }
         }
     </script>
 

@@ -36,13 +36,15 @@ def get_latest_stats():
         # We'll keep the value as is but label it 'JPY/100' in UI
         ex_list[i]['date'] = ex_list[i]['date'].strftime('%d %b %Y')
 
-    # 3. Grocery Stats (Price Catcher)
+    # 3. Grocery Stats (Price Catcher - Now State-Aware)
     df_grocery = pl.read_parquet("data/pricecatcher.parquet")
-    # Average per item per day
-    df_grocery = (
-        df_grocery.group_by(["date", "item_code"])
+    
+    # Average per item per state on latest date
+    latest_date = df_grocery.select(pl.col("date").max()).to_series()[0]
+    df_state_prices = (
+        df_grocery.filter(pl.col("date") == latest_date)
+        .group_by(["state", "item_code"])
         .agg(pl.col("price").mean())
-        .sort("date", descending=True)
     )
     
     ITEM_MAP = {
@@ -55,22 +57,35 @@ def get_latest_stats():
         "94":   ("Red Chili",    "per kg"),
     }
     
-    latest_groceries = []
-    for code, (name, unit) in ITEM_MAP.items():
-        try:
-            item_data = df_grocery.filter(pl.col("item_code") == int(code)).head(2).to_dicts()
-            if len(item_data) >= 1:
-                curr = item_data[0]
-                prev = item_data[1] if len(item_data) > 1 else curr
-                latest_groceries.append({
-                    "name": name,
-                    "unit": unit,
-                    "price": curr["price"],
-                    "chg": curr["price"] - prev["price"],
-                    "date": curr["date"].strftime('%d %b')
-                })
-        except:
-            continue
+    grocery_data = []
+    for row in df_state_prices.to_dicts():
+        code_str = str(row["item_code"])
+        if code_str in ITEM_MAP:
+            name, unit = ITEM_MAP[code_str]
+            grocery_data.append({
+                "state": row["state"],
+                "name": name,
+                "unit": unit,
+                "price": row["price"],
+                "date": latest_date.strftime('%d %b')
+            })
+
+    # List of all states for the dropdown
+    STATES = [
+        "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan", "Pahang", 
+        "Pulau Pinang", "Perak", "Perlis", "Selangor", "Terengganu", "Sabah", "Sarawak",
+        "W.P. Kuala Lumpur", "W.P. Labuan", "W.P. Putrajaya"
+    ]
+
+    # Map state names to capital cities for weather linking
+    STATE_CAPITAL_MAP = {
+        "Johor": "Johor Bahru", "Kedah": "Alor Setar", "Kelantan": "Kota Bharu",
+        "Melaka": "Melaka", "Negeri Sembilan": "Seremban", "Pahang": "Kuantan",
+        "Pulau Pinang": "George Town", "Perak": "Ipoh", "Perlis": "Kangar",
+        "Selangor": "Shah Alam", "Terengganu": "Kuala Terengganu", "Sabah": "Kota Kinabalu",
+        "Sarawak": "Kuching", "W.P. Kuala Lumpur": "Kuala Lumpur", 
+        "W.P. Labuan": "Labuan", "W.P. Putrajaya": "Putrajaya"
+    }
 
     # 4. Weather Stats
     weather_list = []
@@ -126,9 +141,11 @@ def get_latest_stats():
 
     stats = {
         "update_time": datetime.now().strftime("%d %b %Y, %I:%M %p"),
+        "states": STATES,
+        "state_capital_map": STATE_CAPITAL_MAP,
         "fuel": fuel_list[:7],
         "exchange": ex_list[:7],
-        "grocery": latest_groceries,
+        "grocery": grocery_data,
         "weather": weather_list
     }
     return stats
