@@ -46,7 +46,7 @@ def generate_pricecatcher_chart():
         y="price",
         color="item_name",
         labels={"price": "Average Price (RM)", "date": "Date", "item_name": "Essential Item"},
-        title="Essential Grocery Price Trends (April 2026)",
+        title=f"Essential Grocery Price Trends ({datetime.now().strftime('%B %Y')})",
         template="plotly_white"
     )
     

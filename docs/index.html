@@ -181,6 +181,15 @@
         }
         #back-to-top.visible { display: flex; }
 
+        /* ── Traveler Calculator ── */
+        .calc-box { background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid var(--border); margin-bottom: 24px; }
+        .calc-row { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+        .calc-row input { flex: 1; min-width: 140px; padding: 10px 14px; font-size: 1.1rem; border: 1px solid var(--border); border-radius: 8px; font-family: monospace; outline: none; }
+        .calc-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(52,152,219,0.15); }
+        .calc-row select { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: white; font-weight: 600; color: var(--primary); font-size: 1rem; cursor: pointer; }
+        .calc-result { font-size: 1.3rem; font-weight: 800; font-family: monospace; color: #94a3b8; }
+        .calc-result.has-value { color: var(--accent); }
+
         @media (max-width: 600px) {
             body { padding: 10px; }
             .section { padding: 16px; }
@@ -290,6 +299,23 @@
                     </thead>
                     <tbody id="ex-body"></tbody>
                 </table>
+            </div>
+            <h2>🧮 Traveler Calculator</h2>
+            <p class="note">💡 How much RM will you get? Uses today's BNM reference rate — actual money changer rates will vary slightly.</p>
+            <div class="calc-box">
+                <div class="calc-row">
+                    <input type="number" id="calc-input" min="0" placeholder="Enter amount" oninput="calcConvert()" />
+                    <select id="calc-currency" onchange="calcConvert()">
+                        <option value="usd">USD 🇺🇸</option>
+                        <option value="sgd">SGD 🇸🇬</option>
+                        <option value="eur">EUR 🇪🇺</option>
+                        <option value="gbp">GBP 🇬🇧</option>
+                        <option value="jpy">JPY 🇯🇵</option>
+                        <option value="aud">AUD 🇦🇺</option>
+                        <option value="cny">CNY 🇨🇳</option>
+                    </select>
+                </div>
+                <div class="calc-result" id="calc-result">Enter an amount above to see the result.</div>
             </div>
             <h2>📈 Currency Trend Analysis</h2>
             <div class="ex-chart-frame chart-frame">
@@ -461,6 +487,26 @@
             } else {
                 wg.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: #94a3b8;">🌦️ Weather data for this city is temporarily unavailable.</div>';
             }
+        }
+
+        function calcConvert() {
+            if (!rawData || !rawData.exchange || !rawData.exchange[0]) return;
+            const amount = parseFloat(document.getElementById('calc-input').value);
+            const currency = document.getElementById('calc-currency').value;
+            const rate = rawData.exchange[0][currency];
+            const resultEl = document.getElementById('calc-result');
+
+            if (isNaN(amount) || amount <= 0) {
+                resultEl.textContent = 'Enter an amount above to see the result.';
+                resultEl.classList.remove('has-value');
+                return;
+            }
+
+            // JPY rate from BNM is per 100 units
+            const rm = currency === 'jpy' ? (amount / 100) * rate : amount * rate;
+            const label = document.getElementById('calc-currency').options[document.getElementById('calc-currency').selectedIndex].text;
+            resultEl.textContent = `${amount.toLocaleString()} ${label} = RM ${rm.toFixed(2)}`;
+            resultEl.classList.add('has-value');
         }
     </script>
 

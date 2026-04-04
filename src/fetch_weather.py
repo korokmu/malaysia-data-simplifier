@@ -1,6 +1,7 @@
 import polars as pl
 import requests
 import os
+import time
 from datetime import datetime
 
 # 1. Configuration
@@ -34,46 +35,67 @@ def fetch_weather():
     if not os.path.exists(DATA_FOLDER):
         os.makedirs(DATA_FOLDER)
 
+    # Load existing data so we can fall back to it for cities that fail
+    existing = {}
+    if os.path.exists(WEATHER_FILE):
+        df_old = pl.read_parquet(WEATHER_FILE)
+        for row in df_old.to_dicts():
+            existing.setdefault(row["city"], []).append(row)
+
     all_weather = []
+    failed = []
 
     for city, coords in LOCATIONS.items():
-        try:
-            # Fixing typo in LOCATIONS: llon -> lon
-            lon = coords.get("lon") or coords.get("llon")
-            
-            # API: Open-Meteo (Free, no key)
-            url = "https://api.open-meteo.com/v1/forecast"
-            params = {
-                "latitude": coords["lat"],
-                "longitude": lon,
-                "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min"],
-                "timezone": "Asia/Singapore",
-                "forecast_days": 3
-            }
-            
-            response = requests.get(url, params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            
-            daily = data["daily"]
-            for i in range(len(daily["time"])):
-                all_weather.append({
-                    "city": city,
-                    "date": daily["time"][i],
-                    "weather_code": daily["weather_code"][i],
-                    "temp_max": daily["temperature_2m_max"][i],
-                    "temp_min": daily["temperature_2m_min"][i],
-                    "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
-            
-            print(f"✅ {city} data fetched.")
-        except Exception as e:
-            print(f"❌ Failed to fetch weather for {city}: {e}")
+        fetched = False
+        for attempt in range(2):  # 1 retry on timeout
+            try:
+                lon = coords.get("lon") or coords.get("llon")
+                url = "https://api.open-meteo.com/v1/forecast"
+                params = {
+                    "latitude": coords["lat"],
+                    "longitude": lon,
+                    "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min"],
+                    "timezone": "Asia/Singapore",
+                    "forecast_days": 3
+                }
+                response = requests.get(url, params=params, timeout=20)
+                response.raise_for_status()
+                data = response.json()
+                daily = data["daily"]
+                for i in range(len(daily["time"])):
+                    all_weather.append({
+                        "city": city,
+                        "date": daily["time"][i],
+                        "weather_code": daily["weather_code"][i],
+                        "temp_max": daily["temperature_2m_max"][i],
+                        "temp_min": daily["temperature_2m_min"][i],
+                        "fetched_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
+                print(f"✅ {city} data fetched.")
+                fetched = True
+                break
+            except Exception as e:
+                if attempt == 0:
+                    print(f"⚠️ {city} attempt 1 failed, retrying... ({e})")
+                    time.sleep(2)
+                else:
+                    print(f"❌ {city} failed both attempts: {e}")
+                    failed.append(city)
+
+        if not fetched and city in existing:
+            print(f"🔄 {city}: using cached data from previous run.")
+            all_weather.extend(existing[city])
+
+        time.sleep(1)
 
     if all_weather:
         df = pl.DataFrame(all_weather)
+        # Ensure consistent schema (fetched_at may differ in old vs new rows)
+        df = df.with_columns(pl.col("fetched_at").cast(pl.String))
         df.write_parquet(WEATHER_FILE)
         print(f"💾 Saved {len(all_weather)} forecasts to {WEATHER_FILE}")
+        if failed:
+            print(f"⚠️ Used cached data for: {', '.join(failed)}")
 
 if __name__ == "__main__":
     fetch_weather()
