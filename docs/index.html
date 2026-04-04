@@ -43,20 +43,22 @@
 
         .note { font-size: 0.82rem; color: #64748b; background: #f8fafc; border-left: 3px solid #cbd5e1; border-radius: 4px; padding: 10px 14px; margin: -8px 0 20px; line-height: 1.6; }
 
-        .table-container { overflow-x: auto; margin-bottom: 24px; position: relative; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 600px; }
-
-        /* fade-right hint — shows when table can scroll, hides when at end */
-        .table-container::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 48px; height: 100%;
-            background: linear-gradient(to right, transparent, white);
-            pointer-events: none;
-            transition: opacity 0.25s;
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 24px;
+            /* CSS-only scroll shadow: shows a subtle gradient on the right when scrollable */
+            background: 
+                linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+                linear-gradient(to right, rgba(255,255,255,0), white 70%) 0 100%,
+                radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.1), rgba(0,0,0,0)),
+                radial-gradient(farthest-side at 0% 50%, rgba(0,0,0,0.1), rgba(0,0,0,0)) 0 100%;
+            background-repeat: no-repeat;
+            background-color: white;
+            background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+            background-attachment: local, local, scroll, scroll;
         }
-        .table-container.at-end::after { opacity: 0; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; min-width: 600px; background: white; }
         th { text-align: left; background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.7rem; padding: 12px; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); }
         
@@ -272,8 +274,7 @@
                     `;
                 });
 
-                // Check scroll hints AFTER tables are filled with data
-                checkAllTables();
+                // Data will be visible instantly; table-container CSS handles scroll hints
             });
     </script>
 
@@ -284,19 +285,6 @@
         window.addEventListener('scroll', () => {
             btn.classList.toggle('visible', window.scrollY > 300);
         });
-
-        // ── Scroll hint gradient ──
-        // checkAllTables() is called from fetch callback after data is loaded
-        function checkTableScroll(tc) {
-            tc.classList.toggle('at-end', tc.scrollWidth <= tc.clientWidth + 4);
-        }
-        function checkAllTables() {
-            document.querySelectorAll('.table-container').forEach(tc => checkTableScroll(tc));
-        }
-        document.querySelectorAll('.table-container').forEach(tc => {
-            tc.addEventListener('scroll', () => checkTableScroll(tc));
-        });
-        window.addEventListener('resize', checkAllTables);
 
         // ── Active nav highlight on scroll ──
         const navLinks = document.querySelectorAll('.sticky-nav a');
