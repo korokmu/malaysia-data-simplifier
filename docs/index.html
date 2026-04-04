@@ -343,14 +343,26 @@
                 rawData = data;
                 document.getElementById('update-time').textContent = data.update_time;
 
-                // Populate States Dropdown
+                // Populate States Dropdown — grouped by region
                 const ss = document.getElementById('state-select');
-                data.states.forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s;
-                    opt.textContent = s;
-                    if (s === "W.P. Kuala Lumpur") opt.selected = true;
-                    ss.appendChild(opt);
+                const REGIONS = [
+                    { label: "── Northern ──",    states: ["Perlis", "Kedah", "Pulau Pinang", "Perak"] },
+                    { label: "── Central ──",     states: ["Selangor", "W.P. Kuala Lumpur", "W.P. Putrajaya", "Negeri Sembilan"] },
+                    { label: "── Southern ──",    states: ["Melaka", "Johor"] },
+                    { label: "── East Coast ──",  states: ["Kelantan", "Terengganu", "Pahang"] },
+                    { label: "── East Malaysia ──", states: ["Sabah", "Sarawak", "W.P. Labuan"] },
+                ];
+                REGIONS.forEach(region => {
+                    const grp = document.createElement('optgroup');
+                    grp.label = region.label;
+                    region.states.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s;
+                        opt.textContent = s;
+                        if (s === "W.P. Kuala Lumpur") opt.selected = true;
+                        grp.appendChild(opt);
+                    });
+                    ss.appendChild(grp);
                 });
 
                 // Fuel Table
