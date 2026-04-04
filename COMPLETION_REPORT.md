@@ -1,24 +1,62 @@
-# 🚀 v1.0 Completion Report — Malaysia Data Simplifier
+# 🚀 Completion Report — Malaysia Data Simplifier
 
-This report summarizes the final phase of development that brought the project from a prototype to a complete, user-ready dashboard.
+---
 
-## 🌟 New Features
+## v1.0 — Production Launch
+
+### 🌟 Features
 | Feature | Description |
 |---------|-------------|
-| **🌦️ Weather Dashboard** | Added 3-day forecasts for 5 major hubs: Kuala Lumpur, Penang, Johor Bahru, Kuching, and Kota Kinabalu. Uses Open-Meteo API. |
-| **👥 Persona Toggles** | Implemented a 3-way toggle (Local / Visitor / Show All) that reorders sections based on user priority and hides/shows relevant data (e.g., BUDI RON95). |
-| **🧭 Dynamic Scroll-Spy** | A navigation bar that automatically highlights the section currently at the top of the screen, even after persona-based reordering. |
-| **✨ Welcome Note** | Added a clear "Welcome" message to help new users discover the persona switching feature. |
+| **🌦️ Weather Dashboard** | 3-day forecasts for major cities. Uses Open-Meteo API. |
+| **👥 Persona Toggles** | 3-way toggle (Local / Visitor / Show All) reorders sections by relevance. |
+| **🧭 Dynamic Scroll-Spy** | Sticky nav highlights the current section automatically. |
+| **✨ Welcome Note** | Guides new users to discover the persona toggle. |
 
-## 🛠️ Critical Bug Fixes
-- **Mobile "Sticky" Highlight:** Fixed the issue where navigation links stayed blue on Android/iOS after being tapped.
-- **iPhone Table Gradient:** Replaced the absolute-positioned "fade" overlay with a native CSS-only scroll shadow that never lags.
-- **PC Navigation Sync:** Rewrote the navigation logic to dynamically calculate section positions, ensuring the highlight is always accurate regardless of page order.
-
-## 📁 Updated Structure
-- `src/fetch_weather.py` — New data collector.
-- `update.sh` — Updated to include weather in the daily pipeline.
-- `docs/index.html` — Major UI overhaul for personas and weather.
-- `BUG_FIXES.md` — Detailed technical breakdown of mobile/UI fixes.
+### 🛠️ Bug Fixes
+- Mobile sticky nav highlight, iPhone table gradient, PC navigation sync — see `BUG_FIXES.md`.
 
 **Status:** v1.0 Production Ready ✅
+
+---
+
+## v1.1 — Reliability & Expansion
+
+### 🌟 Features
+| Feature | Description |
+|---------|-------------|
+| **💱 Currency Expansion** | Added GBP, JPY, AUD, CNY to exchange table. |
+| **📍 State Selection** | "My State" dropdown — all 16 states/FTs with grocery + weather data. |
+| **📊 Trend Badges** | "Good Deal" / "Price Hike" on grocery cards vs 30-day average. |
+
+### 🛠️ Reliability Fixes
+- `extract_stats.py`: `.group_by(...).first()` for latest data per state.
+- `fetch_weather.py`: 20s timeout + `time.sleep(1)` to reduce API blocks.
+- UI `⚠️` placeholders for empty data states.
+
+**Status:** v1.1 Production Ready ✅
+
+---
+
+## v1.2 — Traveler Tools & Discoverability
+
+### 🌟 Features
+| Feature | Description |
+|---------|-------------|
+| **🧮 Traveler Calculator** | Convert any of 8 currencies to RM instantly using today's BNM rate. |
+| **🗂️ Regional Grouping** | State dropdown grouped: Northern / Central / Southern / East Coast / East Malaysia. |
+| **🇮🇩 IDR Added** | Indonesian Rupiah in exchange table (IDR/10k) and calculator. |
+| **⛽ Diesel Labels** | Clarified to "Diesel (Peninsular)" and "Diesel (Sabah & Sarawak)". |
+| **🔍 SEO + Google** | Meta tags, Open Graph, Google Search Console verified and submitted. |
+
+### 🛠️ Bug Fixes
+- Weather fallback: retry on timeout + cached data for failed cities — all 16 states now guaranteed.
+- Dynamic grocery chart title (was hardcoded "April 2026").
+- Exchange chart removed (was only showing 3 of 8 currencies).
+
+### 📁 Repo Housekeeping
+- `README.md` created (public-facing).
+- `OWNER_GUIDE.md` removed from repo tracking (stays local only).
+- GitHub repo description, homepage URL, and topics updated.
+
+**Status:** v1.2 Production Ready ✅
+
