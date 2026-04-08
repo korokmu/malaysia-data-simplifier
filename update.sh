@@ -28,6 +28,10 @@ $PYTHON src/extract_stats.py      >> "$LOG_FILE" 2>&1
 # Validate everything looks OK
 $PYTHON src/validate.py           >> "$LOG_FILE" 2>&1
 
+# Ensure Git uses the noreply email for privacy
+git config user.name "korokmu"
+git config user.email "217773490+korokmu@users.noreply.github.com"
+
 # Commit and push updated docs/ to GitHub Pages
 git add docs/
 git diff --cached --quiet && echo "$(date): No changes to commit" >> "$LOG_FILE" && exit 0
