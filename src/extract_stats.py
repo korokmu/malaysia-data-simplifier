@@ -24,17 +24,18 @@ def get_latest_stats():
     
     ex_list = df_ex.head(8).to_dicts()
     for i in range(len(ex_list) - 1):
-        ex_list[i]['usd_chg'] = ex_list[i]['usd'] - ex_list[i+1]['usd']
-        ex_list[i]['sgd_chg'] = ex_list[i]['sgd'] - ex_list[i+1]['sgd']
-        ex_list[i]['eur_chg'] = ex_list[i]['eur'] - ex_list[i+1]['eur']
-        ex_list[i]['gbp_chg'] = ex_list[i]['gbp'] - ex_list[i+1]['gbp']
-        ex_list[i]['jpy_chg'] = ex_list[i]['jpy'] - ex_list[i+1]['jpy']
-        ex_list[i]['aud_chg'] = ex_list[i]['aud'] - ex_list[i+1]['aud']
-        ex_list[i]['cny_chg'] = ex_list[i]['cny'] - ex_list[i+1]['cny']
-        ex_list[i]['idr_chg'] = ex_list[i]['idr'] - ex_list[i+1]['idr']
+        # Calculate changes for all
+        for key in ['usd', 'sgd', 'eur', 'gbp', 'aud', 'cny', 'idr']:
+            ex_list[i][f'{key}_chg'] = ex_list[i][key] - ex_list[i+1][key]
         
-        # Convert JPY to 1-unit price for the dashboard display consistency (if BNM gives per 100)
-        # We'll keep the value as is but label it 'JPY/100' in UI
+        # FIX: JPY is quoted per 100 units in Malaysia
+        # Calculate change first, then scale both
+        jpy_raw = ex_list[i]['jpy']
+        prev_jpy_raw = ex_list[i+1]['jpy']
+        
+        ex_list[i]['jpy_chg'] = (jpy_raw - prev_jpy_raw) * 100
+        ex_list[i]['jpy'] = jpy_raw * 100
+        
         ex_list[i]['date'] = ex_list[i]['date'].strftime('%d %b %Y')
 
     # 3. Grocery Stats (Price Catcher - Now State-Aware + Trend)
