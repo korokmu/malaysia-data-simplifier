@@ -25,16 +25,20 @@ def get_latest_stats():
     ex_list = df_ex.head(8).to_dicts()
     for i in range(len(ex_list) - 1):
         # Calculate changes for all
-        for key in ['usd', 'sgd', 'eur', 'gbp', 'aud', 'cny', 'idr']:
+        for key in ['usd', 'sgd', 'eur', 'gbp', 'aud', 'cny']:
             ex_list[i][f'{key}_chg'] = ex_list[i][key] - ex_list[i+1][key]
         
-        # FIX: JPY is quoted per 100 units in Malaysia
-        # Calculate change first, then scale both
+        # FIX: JPY (100 units) and IDR (10,000 units) scaling
+        # Calculate change first, then scale both for display
         jpy_raw = ex_list[i]['jpy']
-        prev_jpy_raw = ex_list[i+1]['jpy']
-        
-        ex_list[i]['jpy_chg'] = (jpy_raw - prev_jpy_raw) * 100
+        prev_jpy = ex_list[i+1]['jpy']
+        ex_list[i]['jpy_chg'] = (jpy_raw - prev_jpy) * 100
         ex_list[i]['jpy'] = jpy_raw * 100
+
+        idr_raw = ex_list[i]['idr']
+        prev_idr = ex_list[i+1]['idr']
+        ex_list[i]['idr_chg'] = (idr_raw - prev_idr) * 10000
+        ex_list[i]['idr'] = idr_raw * 10000
         
         ex_list[i]['date'] = ex_list[i]['date'].strftime('%d %b %Y')
 
