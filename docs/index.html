@@ -590,6 +590,33 @@
 
         window.addEventListener('scroll', updateNav, { passive: true });
         window.addEventListener('load', updateNav);
+
+        // ── Smart Auto-Reload (Isolated) ──
+        (function() {
+            const PAGE_LOAD_TIME = Date.now();
+            let idleTimeout;
+
+            const resetTimer = () => {
+                clearTimeout(idleTimeout);
+                // Reload if user is completely idle for 30 minutes
+                idleTimeout = setTimeout(() => location.reload(), 30 * 60000);
+            };
+
+            // 1. Refresh if returning to an old tab (page is > 1 hour old)
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    const ageInHours = (Date.now() - PAGE_LOAD_TIME) / 3600000;
+                    if (ageInHours > 1) location.reload();
+                }
+            });
+
+            // 2. Refresh if completely idle (no movement/scroll for 30 mins)
+            ['mousemove', 'scroll', 'keydown', 'touchstart', 'click'].forEach(evt => {
+                window.addEventListener(evt, resetTimer, { passive: true });
+            });
+
+            resetTimer();
+        })();
     </script>
 </body>
 </html>
