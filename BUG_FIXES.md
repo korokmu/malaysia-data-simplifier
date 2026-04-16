@@ -19,3 +19,11 @@
 | **Hardcoded chart title** | `chart_pricecatcher.py` had `"April 2026"` hardcoded in the chart title. | Replaced with `datetime.now().strftime('%B %Y')` — updates automatically each month. |
 | **Exchange chart incomplete** | `chart_exchange.py` only plotted 3 of 8 currencies (USD, SGD, EUR). | Chart removed entirely. The table + traveler calculator cover all 8 currencies more clearly. |
 
+---
+
+## Traveler Calculator Fix (v1.2.1 — April 16, 2026)
+
+| Issue | Root Cause | Fix |
+|-------|------------|-----|
+| **IDR calculator value wrong** | Calculator was multiplying the full IDR amount by the 10,000-unit rate (e.g., 10,000 IDR * 2.31 = 23,100 RM). | Updated `docs/index.html` to divide the IDR amount by 10,000 before applying the rate. Now 10,000 IDR correctly shows as RM 2.31. |
+

@@ -534,8 +534,16 @@
                 return;
             }
 
-            // JPY rate from BNM is per 100 units; IDR is per 1 unit (very small, no scaling needed)
-            const rm = currency === 'jpy' ? (amount / 100) * rate : amount * rate;
+            // JPY rate in JSON is per 100 units; IDR is per 10,000 units
+            let rm;
+            if (currency === 'jpy') {
+                rm = (amount / 100) * rate;
+            } else if (currency === 'idr') {
+                rm = (amount / 10000) * rate;
+            } else {
+                rm = amount * rate;
+            }
+
             const label = document.getElementById('calc-currency').options[document.getElementById('calc-currency').selectedIndex].text;
             resultEl.textContent = `${amount.toLocaleString()} ${label} = RM ${rm.toFixed(2)}`;
             resultEl.classList.add('has-value');
