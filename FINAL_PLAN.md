@@ -22,7 +22,7 @@ An automated, resource-aware pipeline for Arch Linux to transform data.gov.my in
 - `docs/index.html`: Mobile-friendly dashboard with persona toggle, state selector, traveler calculator.
 
 ## 5. Automation
-- `systemd` timer for 2:00 AM daily updates.
+systemd timer for 12:05 AM daily updates.
 - Automatic git deployment to GitHub Pages.
 - Weather fetch has retry logic + cached fallback for reliability.
 

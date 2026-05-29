@@ -1,6 +1,6 @@
 # 🇲🇾 Malaysia Data Simplifier
 
-A fully automated daily dashboard that pulls Malaysian public data and presents it in a clean, mobile-friendly website — updated every night at 2 AM automatically.
+A fully automated daily dashboard that pulls Malaysian public data and presents it in a clean, mobile-friendly website — updated every night at 12:05 AM automatically.
 
 **Live site:** https://korokmu.github.io/malaysia-data-simplifier/
 

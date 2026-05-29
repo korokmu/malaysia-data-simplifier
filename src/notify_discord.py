@@ -47,7 +47,7 @@ def send_discord_notification():
             {"name": "⛽ Fuel Prices", "value": fuel_txt, "inline": True},
             {"name": "💹 Exchange Rates", "value": ex_txt, "inline": True},
         ],
-        "footer": {"text": "Data from data.gov.my | Automatically updated at 2:00 AM"}
+        "footer": {"text": "Data from data.gov.my | Automatically updated at 12:05 AM"}
     }
 
     payload = {
