@@ -17,7 +17,7 @@ def check_health():
     data_files = {
         "data/fuel_prices.parquet": "Fuel Prices",
         "data/exchange_rates.parquet": "Exchange Rates",
-        "data/pricecatcher.parquet": "Grocery Prices"
+        # "data/pricecatcher.parquet": "Grocery Prices"
     }
 
     for path, name in data_files.items():
@@ -43,19 +43,19 @@ def check_health():
                 stats = json.load(f)
             
             # Check for keys
-            for key in ["fuel", "exchange", "grocery", "update_time"]:
+            for key in ["fuel", "exchange", "update_time"]:
                 if key not in stats:
                     errors.append(f"❌ Missing key in JSON: {key}")
             
-            if not stats["grocery"]:
-                warnings.append("⚠️ Grocery stats are empty in JSON.")
+            # if not stats["grocery"]:
+            #     warnings.append("⚠️ Grocery stats are empty in JSON.")
             
             print(f"✅ JSON Stats: Valid (Updated {stats['update_time']})")
         except Exception as e:
             errors.append(f"❌ Error parsing JSON: {e}")
 
     # 4. Check HTML Charts
-    html_files = ["docs/index.html", "docs/fuel_chart.html", "docs/exchange_chart.html", "docs/pricecatcher_chart.html"]
+    html_files = ["docs/index.html", "docs/fuel_chart.html", "docs/exchange_chart.html"] # "docs/pricecatcher_chart.html"
     for html in html_files:
         if not os.path.exists(html):
             errors.append(f"❌ Missing HTML: {html}")

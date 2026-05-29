@@ -16,13 +16,13 @@ cd "$PROJECT_DIR"
 # Fetch fresh data
 $PYTHON src/fetch_fuel.py         >> "$LOG_FILE" 2>&1
 $PYTHON src/fetch_exchange.py     >> "$LOG_FILE" 2>&1
-$PYTHON src/fetch_pricecatcher.py >> "$LOG_FILE" 2>&1
+# $PYTHON src/fetch_pricecatcher.py >> "$LOG_FILE" 2>&1
 $PYTHON src/fetch_weather.py      >> "$LOG_FILE" 2>&1
 
 # Regenerate charts and stats
 $PYTHON src/chart_fuel.py         >> "$LOG_FILE" 2>&1
 $PYTHON src/chart_exchange.py     >> "$LOG_FILE" 2>&1
-$PYTHON src/chart_pricecatcher.py >> "$LOG_FILE" 2>&1
+# $PYTHON src/chart_pricecatcher.py >> "$LOG_FILE" 2>&1
 $PYTHON src/extract_stats.py      >> "$LOG_FILE" 2>&1
 
 # Validate everything looks OK

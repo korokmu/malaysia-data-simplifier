@@ -4,7 +4,7 @@
 An automated, resource-aware pipeline for Arch Linux to transform data.gov.my into simplified insights for Locals and Visitors.
 
 ## 2. Audience Targets
-- **Locals:** Cost-of-living focus — Fuel prices, grocery prices by state, trend badges.
+- **Locals:** Cost-of-living focus — Fuel prices, trend badges.
 - **Visitors:** Travel essentials — Exchange rates (8 currencies), RM calculator, weather forecasts.
 
 ## 3. Technical Stack
@@ -14,8 +14,8 @@ An automated, resource-aware pipeline for Arch Linux to transform data.gov.my in
 - **Environment:** Isolated `.venv` on Linux.
 
 ## 4. Pipeline Structure
-- `src/fetch_*.py`: Individual data collectors (fuel, exchange, pricecatcher, weather).
-- `src/chart_*.py`: Charts for fuel and grocery (exchange chart removed in v1.2).
+- `src/fetch_*.py`: Individual data collectors (fuel, exchange, weather).
+- `src/chart_*.py`: Charts for fuel.
 - `src/extract_stats.py`: Builds `latest_stats.json` for the dashboard.
 - `src/notify_discord.py`: Optional Discord notification (needs `.env` setup).
 - `src/validate.py`: Health checks after each run.

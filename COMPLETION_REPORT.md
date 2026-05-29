@@ -60,3 +60,21 @@
 
 **Status:** v1.2 Production Ready ✅
 
+---
+
+## v1.3 — Streamlining & Reliability
+
+### 🌟 Features
+| Feature | Description |
+|---------|-------------|
+| **📉 Grocery Removal** | Removed PriceCatcher data to focus on high-frequency, more reliable datasets (Fuel, Exchange, Weather). |
+| **🚀 Fast-Track Sync** | Dashboard now loads significantly faster by removing heavy grocery parquet scans. |
+
+### 🛠️ Structural Changes
+- `update.sh`: Disabled `fetch_pricecatcher.py` and `chart_pricecatcher.py`.
+- `extract_stats.py`: Grocery trend logic commented out; `grocery` key removed from stats JSON.
+- `validate.py`: Health checks updated to skip grocery requirements.
+- `index.html`: UI cleaned up, SEO updated, and sticky nav simplified.
+
+**Status:** v1.3 Production Ready ✅
+

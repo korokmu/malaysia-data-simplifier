@@ -42,56 +42,56 @@ def get_latest_stats():
         
         ex_list[i]['date'] = ex_list[i]['date'].strftime('%d %b %Y')
 
-    # 3. Grocery Stats (Price Catcher - Now State-Aware + Trend)
-    df_grocery = pl.read_parquet("data/pricecatcher.parquet")
+    # 3. Grocery Stats (Price Catcher - Now State-Aware + Trend) - DISABLED
+    # df_grocery = pl.read_parquet("data/pricecatcher.parquet")
     
     # Calculate 30-day averages per state/item
-    df_30d_avg = (
-        df_grocery.group_by(["state", "item_code"])
-        .agg(pl.col("price").mean().alias("avg_30d"))
-    )
+    # df_30d_avg = (
+    #     df_grocery.group_by(["state", "item_code"])
+    #     .agg(pl.col("price").mean().alias("avg_30d"))
+    # )
 
     # Get latest price per state/item (most robust)
-    df_latest_state_prices = (
-        df_grocery.sort("date", descending=True)
-        .group_by(["state", "item_code"])
-        .first() # Takes the newest row for every combo
-    )
+    # df_latest_state_prices = (
+    #     df_grocery.sort("date", descending=True)
+    #     .group_by(["state", "item_code"])
+    #     .first() # Takes the newest row for every combo
+    # )
     
     # Join with 30d avg
-    df_trends = df_latest_state_prices.join(df_30d_avg, on=["state", "item_code"])
+    # df_trends = df_latest_state_prices.join(df_30d_avg, on=["state", "item_code"])
 
-    ITEM_MAP = {
-        "1":    ("Chicken",      "per kg"),
-        "1109": ("Eggs Grd A",   "per 30 pcs"),
-        "1110": ("Eggs Grd B",   "per 30 pcs"),
-        "1111": ("Eggs Grd C",   "per 30 pcs"),
-        "129":  ("Onions",       "per kg"),
-        "114":  ("Tomato",       "per kg"),
-        "94":   ("Red Chili",    "per kg"),
-    }
+    # ITEM_MAP = {
+    #     "1":    ("Chicken",      "per kg"),
+    #     "1109": ("Eggs Grd A",   "per 30 pcs"),
+    #     "1110": ("Eggs Grd B",   "per 30 pcs"),
+    #     "1111": ("Eggs Grd C",   "per 30 pcs"),
+    #     "129":  ("Onions",       "per kg"),
+    #     "114":  ("Tomato",       "per kg"),
+    #     "94":   ("Red Chili",    "per kg"),
+    # }
     
-    grocery_data = []
-    for row in df_trends.to_dicts():
-        code_str = str(row["item_code"])
-        if code_str in ITEM_MAP:
-            name, unit = ITEM_MAP[code_str]
+    # grocery_data = []
+    # for row in df_trends.to_dicts():
+    #     code_str = str(row["item_code"])
+    #     if code_str in ITEM_MAP:
+    #         name, unit = ITEM_MAP[code_str]
             
-            # Logic for trend badge
-            trend = "flat"
-            if row["price"] < row["avg_30d"] * 0.98: # 2% cheaper than avg
-                trend = "good"
-            elif row["price"] > row["avg_30d"] * 1.02: # 2% more expensive
-                trend = "high"
+    #         # Logic for trend badge
+    #         trend = "flat"
+    #         if row["price"] < row["avg_30d"] * 0.98: # 2% cheaper than avg
+    #             trend = "good"
+    #         elif row["price"] > row["avg_30d"] * 1.02: # 2% more expensive
+    #             trend = "high"
 
-            grocery_data.append({
-                "state": row["state"],
-                "name": name,
-                "unit": unit,
-                "price": row["price"],
-                "trend": trend,
-                "date": row["date"].strftime('%d %b') # Individual date per item/state
-            })
+    #         grocery_data.append({
+    #             "state": row["state"],
+    #             "name": name,
+    #             "unit": unit,
+    #             "price": row["price"],
+    #             "trend": trend,
+    #             "date": row["date"].strftime('%d %b') # Individual date per item/state
+    #         })
 
     # List of all states for the dropdown
     STATES = [
@@ -168,7 +168,6 @@ def get_latest_stats():
         "state_capital_map": STATE_CAPITAL_MAP,
         "fuel": fuel_list[:7],
         "exchange": ex_list[:7],
-        "grocery": grocery_data,
         "weather": weather_list
     }
     return stats

@@ -13,7 +13,6 @@ A fully automated daily dashboard that pulls Malaysian public data and presents 
 | ⛽ Fuel Prices | RON95, RON97, Diesel weekly prices + trend | data.gov.my |
 | 💹 Exchange Rates | USD, SGD, EUR, GBP, JPY, AUD, CNY vs MYR + trend | Bank Negara Malaysia via data.gov.my |
 | 🧮 Traveler Calculator | Convert any currency to RM instantly | BNM live rate |
-| 🛒 Grocery Prices | Chicken, eggs, onions, tomatoes, chili per state | PriceCatcher via data.gov.my |
 | 🌦️ Weather | 3-day forecast for all 16 states/territories | Open-Meteo |
 
 ---
@@ -22,7 +21,6 @@ A fully automated daily dashboard that pulls Malaysian public data and presents 
 
 - **State selector** — switch between all 16 Malaysian states/federal territories, grouped by region
 - **Persona toggle** — Local view (cost of living focus) vs Visitor view (travel essentials)
-- **Trend badges** — "Good Deal" / "Price Hike" on grocery items vs 30-day average
 - **Price change indicators** — ▲/▼ arrows on fuel and exchange rates vs previous week/day
 - **Fully automated** — runs daily via systemd timer, commits and pushes to GitHub Pages
 
@@ -45,11 +43,9 @@ malaysia-data-simplifier/
 ├── src/
 │   ├── fetch_fuel.py           ← Downloads weekly fuel price data
 │   ├── fetch_exchange.py       ← Downloads daily exchange rates
-│   ├── fetch_pricecatcher.py   ← Downloads monthly grocery prices
 │   ├── fetch_weather.py        ← Downloads 3-day weather forecasts
 │   ├── chart_fuel.py           ← Generates fuel trend chart
 │   ├── chart_exchange.py       ← Generates exchange rate chart
-│   ├── chart_pricecatcher.py   ← Generates grocery price chart
 │   ├── extract_stats.py        ← Builds latest_stats.json for dashboard
 │   ├── notify_discord.py       ← Optional Discord update notification
 │   └── validate.py             ← Health checks after each run
