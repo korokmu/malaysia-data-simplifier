@@ -220,9 +220,85 @@
             .sticky-nav { margin: 0 -10px 16px; gap: 6px; }
             .sticky-nav a { font-size: 0.78rem; padding: 5px 10px; }
         }
+
+        /* ── Maintenance Mode Styling ── */
+        .maintenance-card {
+            display: none;
+            max-width: 580px;
+            margin: 60px auto;
+            text-align: center;
+            background: #ffffff;
+            padding: 48px 32px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+        .maintenance-active .maintenance-card {
+            display: block;
+        }
+        .maintenance-active .container {
+            display: none !important;
+        }
+        .maintenance-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        .maintenance-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #fde68a;
+        }
+        .maintenance-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        .maintenance-text {
+            color: #64748b;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .maintenance-footer {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
     </style>
 </head>
-<body>
+<body class="maintenance-active">
+
+    <!-- 🛠️ MAINTENANCE MODE SCREEN -->
+    <div class="maintenance-card">
+        <div class="maintenance-icon">🛠️</div>
+        <div class="maintenance-badge">⚠️ System Update in Progress</div>
+        <h1 class="maintenance-title">Under Maintenance</h1>
+        <p class="maintenance-text">
+            <b>Malaysia Data Simplifier</b> is currently undergoing scheduled maintenance while we update our pipeline to reflect recent government fuel policy and pricing adjustments.
+        </p>
+        <p class="maintenance-text" style="font-size: 0.9rem; background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px dashed #cbd5e1;">
+            💡 <i>We are refining our data sources and calculations to ensure accuracy. The dashboard will be back online shortly!</i>
+        </p>
+        <div class="maintenance-footer">
+            🇲🇾 Malaysia Data Simplifier &bull; Updated Automatically
+        </div>
+    </div>
 
     <div class="container">
         <header>
