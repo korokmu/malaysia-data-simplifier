@@ -27,3 +27,11 @@
 |-------|------------|-----|
 | **IDR calculator value wrong** | Calculator was multiplying the full IDR amount by the 10,000-unit rate (e.g., 10,000 IDR * 2.31 = 23,100 RM). | Updated `docs/index.html` to divide the IDR amount by 10,000 before applying the rate. Now 10,000 IDR correctly shows as RM 2.31. |
 
+---
+
+## Maintenance Mode & Fuel Policy Adjustment (August 2026)
+
+| Change | Reason | Implementation |
+|--------|--------|----------------|
+| **Site Maintenance Mode** | Government fuel policy updates requiring pipeline review. | Added `.maintenance-active` CSS overlay and animated maintenance card to `docs/index.html`. Hidden main dashboard container while retaining 100% of underlying code for instant restoration. |
+

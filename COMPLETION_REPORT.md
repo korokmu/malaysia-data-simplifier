@@ -73,8 +73,18 @@
 ### 🛠️ Structural Changes
 - `update.sh`: Disabled `fetch_pricecatcher.py` and `chart_pricecatcher.py`.
 - `extract_stats.py`: Grocery trend logic commented out; `grocery` key removed from stats JSON.
-- `validate.py`: Health checks updated to skip grocery requirements.
-- `index.html`: UI cleaned up, SEO updated, and sticky nav simplified.
-
 **Status:** v1.3 Production Ready ✅
+
+---
+
+## v1.4 — Temporary Maintenance Mode (August 2026)
+
+### 🛠️ Updates
+| Feature / Action | Description |
+|------------------|-------------|
+| **🛠️ Maintenance Overlay** | Added a modern, animated maintenance screen overlay to `docs/index.html` to inform visitors of ongoing government fuel policy updates. |
+| **🛡️ Code Preservation** | Used CSS toggle (`.maintenance-active`) so all HTML, JS calculations, exchange tables, and weather components remain 100% intact and preserved. |
+| **🔄 Simple Reactivation** | Instant restoration path prepared — simply removing `class="maintenance-active"` from `<body>` in `docs/index.html` restores the live dashboard. |
+
+**Status:** Maintenance Mode Active ⚠️
 
